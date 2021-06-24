@@ -3,6 +3,8 @@ package com.projectg.geyserupdater.spigot.command;
 import com.projectg.geyserupdater.common.Messages;
 import com.projectg.geyserupdater.common.logger.UpdaterLogger;
 import com.projectg.geyserupdater.common.util.GeyserProperties;
+import com.projectg.geyserupdater.spigot.SpigotUpdater;
+import com.projectg.geyserupdater.spigot.util.FloodgateSpigotDownloader;
 import com.projectg.geyserupdater.spigot.util.GeyserSpigotDownloader;
 
 import org.bukkit.ChatColor;
@@ -33,6 +35,9 @@ public class GeyserUpdateCommand implements CommandExecutor {
                     } else {
                         sender.sendMessage(ChatColor.GOLD + "[GeyserUpdater] " + Messages.Command.OUTDATED);
                         GeyserSpigotDownloader.updateGeyser();
+                        if (SpigotUpdater.getPlugin().getConfig().getBoolean("Enable-Update-Floodgate")) {
+                            FloodgateSpigotDownloader.updateFloodgate();
+                        }
                     }
                 } catch (IOException e) {
                     sender.sendMessage(ChatColor.RED + "[GeyserUpdater] " + Messages.Command.FAIL_CHECK);

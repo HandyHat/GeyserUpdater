@@ -3,10 +3,12 @@ package com.projectg.geyserupdater.spigot;
 import com.projectg.geyserupdater.common.logger.JavaUtilUpdaterLogger;
 import com.projectg.geyserupdater.common.logger.UpdaterLogger;
 import com.projectg.geyserupdater.common.util.FileUtils;
+import com.projectg.geyserupdater.common.util.FloodgateProperties;
 import com.projectg.geyserupdater.common.util.GeyserProperties;
 import com.projectg.geyserupdater.spigot.command.GeyserUpdateCommand;
 import com.projectg.geyserupdater.spigot.listeners.SpigotJoinListener;
 import com.projectg.geyserupdater.spigot.util.CheckSpigotRestart;
+import com.projectg.geyserupdater.spigot.util.FloodgateSpigotDownloader;
 import com.projectg.geyserupdater.spigot.util.GeyserSpigotDownloader;
 import com.projectg.geyserupdater.common.util.SpigotResourceUpdateChecker;
 import com.projectg.geyserupdater.spigot.util.bstats.Metrics;
@@ -133,10 +135,22 @@ public class SpigotUpdater extends JavaPlugin {
             public void run() {
                 UpdaterLogger.getLogger().debug("Checking if a new build of Geyser exists.");
                 try {
-                    boolean isLatest = GeyserProperties.isLatestBuild();
-                    if (!isLatest) {
+                    boolean isLatestGeyser = GeyserProperties.isLatestBuild();
+                    if (!isLatestGeyser) {
                         UpdaterLogger.getLogger().info("A newer build of Geyser is available! Attempting to download the latest build now...");
                         GeyserSpigotDownloader.updateGeyser();
+                    }
+                    if (getConfig().getBoolean("Auto-Update-Floodgate")) {
+                        try {
+                            boolean isLatestFloodgate = FloodgateProperties.isLatestBuild();
+                            if (!isLatestFloodgate) {
+                                UpdaterLogger.getLogger().info("A newer build of Floodgate is available! Attempting to download the latest build now...");
+                                FloodgateSpigotDownloader.updateFloodgate();
+                            }
+                        } catch (Exception e) {
+                            UpdaterLogger.getLogger().error("Failed to check for updates to Floodgate! We were unable to reach the Floodgate build server, or your local branch does not exist on it.");
+                            e.printStackTrace();
+                        }
                     }
                 } catch (IOException e) {
                     UpdaterLogger.getLogger().error("Failed to check for updates to Geyser! We were unable to reach the Geyser build server, or your local branch does not exist on it.");
